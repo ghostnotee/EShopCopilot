@@ -18,7 +18,7 @@ I need to implement the business logic and Minimal APIs for the `Product` domain
 3. **Program.cs**: Update the DI container to register `ProductService` as a Singleton (to persist the in-memory list during the app lifecycle) and call `MapProductEndpoints()`.
 4. **ApiService.http**: Add complete HTTP request examples to test all 5 endpoints (GET all, GET by ID, POST new, PUT update, DELETE). Include valid JSON request bodies matching the Product model.
 
-Ensure the code follows modern C# 12 and .NET 10 Minimal API best practices.
+Ensure the code follows modern C# 14 and .NET 10 Minimal API best practices.
 
 -- allow permissions
 
