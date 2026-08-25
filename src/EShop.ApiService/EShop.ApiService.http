@@ -1,6 +1,39 @@
 @ApiService_HostAddress = http://localhost:5596
+@ProductId = 11111111-1111-1111-1111-111111111111
 
-GET {{ApiService_HostAddress}}/weatherforecast/
+GET {{ApiService_HostAddress}}/products/
 Accept: application/json
 
 ###
+
+GET {{ApiService_HostAddress}}/products/{{ProductId}}
+Accept: application/json
+
+###
+
+POST {{ApiService_HostAddress}}/products/
+Content-Type: application/json
+
+{
+  "name": "Summit Stainless Water Bottle",
+  "description": "Insulated 750 milliliter bottle that keeps drinks cold for 24 hours.",
+  "price": 27.99,
+  "imageUrl": "https://images.example.com/products/summit-water-bottle.jpg"
+}
+
+###
+
+PUT {{ApiService_HostAddress}}/products/{{ProductId}}
+Content-Type: application/json
+
+{
+  "name": "Aurora Wireless Headphones - Updated",
+  "description": "Noise-cancelling over-ear headphones with 40-hour battery life.",
+  "price": 119.99,
+  "imageUrl": "https://images.example.com/products/aurora-headphones-updated.jpg"
+}
+
+###
+
+DELETE {{ApiService_HostAddress}}/products/{{ProductId}}
+Accept: application/json

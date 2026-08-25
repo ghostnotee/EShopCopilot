@@ -1,3 +1,6 @@
+using EShop.ApiService.Endpoints;
+using EShop.ApiService.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
@@ -5,6 +8,7 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+builder.Services.AddSingleton<ProductService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -20,5 +24,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapDefaultEndpoints();
+app.MapProductEndpoints();
 
 app.Run();
