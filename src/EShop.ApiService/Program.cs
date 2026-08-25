@@ -9,6 +9,7 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<ProductService>();
+builder.Services.AddSingleton<OrderService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -25,5 +26,6 @@ if (app.Environment.IsDevelopment())
 
 app.MapDefaultEndpoints();
 app.MapProductEndpoints();
+app.MapOrderEndpoints();
 
 app.Run();

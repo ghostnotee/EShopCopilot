@@ -1,5 +1,6 @@
 @ApiService_HostAddress = http://localhost:5596
 @ProductId = 11111111-1111-1111-1111-111111111111
+@OrderId = aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
 
 GET {{ApiService_HostAddress}}/products/
 Accept: application/json
@@ -36,4 +37,45 @@ Content-Type: application/json
 ###
 
 DELETE {{ApiService_HostAddress}}/products/{{ProductId}}
+Accept: application/json
+
+###
+
+GET {{ApiService_HostAddress}}/orders/
+Accept: application/json
+
+###
+
+GET {{ApiService_HostAddress}}/orders/{{OrderId}}
+Accept: application/json
+
+###
+
+POST {{ApiService_HostAddress}}/orders/
+Content-Type: application/json
+
+{
+  "customerName": "Sofia Ramirez",
+  "shippingAddress": "789 Pine Road, Denver, CO 80202",
+  "totalAmount": 49.95,
+  "status": "Pending",
+  "orderedAt": "2026-08-26T10:00:00Z"
+}
+
+###
+
+PUT {{ApiService_HostAddress}}/orders/{{OrderId}}
+Content-Type: application/json
+
+{
+  "customerName": "Maya Chen",
+  "shippingAddress": "123 Market Street, Portland, OR 97205",
+  "totalAmount": 129.99,
+  "status": "Shipped",
+  "orderedAt": "2026-08-20T14:30:00Z"
+}
+
+###
+
+DELETE {{ApiService_HostAddress}}/orders/{{OrderId}}
 Accept: application/json
