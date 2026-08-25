@@ -7,7 +7,7 @@ public static class ProductEndpoints
 {
     public static IEndpointRouteBuilder MapProductEndpoints(this IEndpointRouteBuilder app)
     {
-        var products = app.MapGroup("/products")
+        RouteGroupBuilder products = app.MapGroup("/products")
             .WithTags("Products");
 
         products.MapGet("/", (ProductService service) =>
@@ -15,7 +15,7 @@ public static class ProductEndpoints
 
         products.MapGet("/{id:guid}", (Guid id, ProductService service) =>
         {
-            var product = service.GetById(id);
+            Product? product = service.GetById(id);
             return product is null
                 ? Results.NotFound()
                 : Results.Ok(product);
@@ -23,7 +23,7 @@ public static class ProductEndpoints
 
         products.MapPost("/", (Product product, ProductService service) =>
         {
-            var createdProduct = service.Create(product);
+            Product createdProduct = service.Create(product);
             return Results.Created($"/products/{createdProduct.Id}", createdProduct);
         });
 
