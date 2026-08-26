@@ -1,5 +1,5 @@
-using EShop.ApiService.Models;
 using EShop.ApiService.Services;
+using EShop.Shared.Models;
 
 namespace EShop.ApiService.Endpoints;
 

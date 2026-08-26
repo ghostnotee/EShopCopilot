@@ -10,6 +10,7 @@ builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<ProductService>();
 builder.Services.AddSingleton<OrderService>();
+builder.Services.AddSingleton<CartService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -27,5 +28,6 @@ if (app.Environment.IsDevelopment())
 app.MapDefaultEndpoints();
 app.MapProductEndpoints();
 app.MapOrderEndpoints();
+app.MapCartEndpoints();
 
 app.Run();

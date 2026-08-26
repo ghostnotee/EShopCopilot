@@ -1,4 +1,4 @@
-using EShop.ApiService.Models;
+using EShop.Shared.Models;
 
 namespace EShop.ApiService.Services;
 

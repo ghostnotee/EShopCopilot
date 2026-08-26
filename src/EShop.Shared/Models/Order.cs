@@ -1,4 +1,4 @@
-namespace EShop.ApiService.Models;
+namespace EShop.Shared.Models;
 
 public class Order
 {
