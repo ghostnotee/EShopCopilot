@@ -146,3 +146,4 @@ prompt:
 can you list the issues from the remote repo, use GitHub MCP Server
 or
 can you list the commits from the remote repo, use GitHub MCP Server
+
