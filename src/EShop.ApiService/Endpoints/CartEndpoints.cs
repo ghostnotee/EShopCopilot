@@ -17,22 +17,7 @@ public static class CartEndpoints
         });
 
         cart.MapPost("/items", (AddCartItemRequest request, HttpRequest httpRequest, CartService cartService) =>
-        {
-            try
-            {
-                string cartId = GetCartId(httpRequest);
-                ShoppingCart updatedCart = cartService.AddItem(cartId, request.ProductId, request.Quantity);
-                return Results.Ok(updatedCart);
-            }
-            catch (KeyNotFoundException)
-            {
-                return Results.NotFound();
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return Results.BadRequest();
-            }
-        });
+            Results.Ok(cartService.AddItem(GetCartId(httpRequest), request.ProductId, request.Quantity)));
 
         cart.MapDelete("/items/{productId:guid}", (Guid productId, HttpRequest request, CartService cartService) =>
         {
@@ -44,20 +29,8 @@ public static class CartEndpoints
 
         cart.MapPost("/checkout", (CheckoutRequest request, HttpRequest httpRequest, CartService cartService) =>
         {
-            try
-            {
-                string cartId = GetCartId(httpRequest);
-                Order createdOrder = cartService.Checkout(cartId, request);
-                return Results.Created($"/api/orders/{createdOrder.Id}", createdOrder);
-            }
-            catch (ArgumentException)
-            {
-                return Results.BadRequest();
-            }
-            catch (InvalidOperationException)
-            {
-                return Results.BadRequest();
-            }
+            Order createdOrder = cartService.Checkout(GetCartId(httpRequest), request);
+            return Results.Created($"/api/orders/{createdOrder.Id}", createdOrder);
         });
 
         return app;

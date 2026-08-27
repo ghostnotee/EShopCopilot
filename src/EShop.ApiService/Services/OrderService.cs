@@ -12,7 +12,7 @@ public sealed class OrderService
             CustomerName = "Maya Chen",
             ShippingAddress = "123 Market Street, Portland, OR 97205",
             TotalAmount = 129.99m,
-            Status = "Processing",
+            Status = OrderStatus.Processing,
             OrderedAt = new DateTimeOffset(2026, 8, 20, 14, 30, 0, TimeSpan.Zero)
         },
         new()
@@ -21,7 +21,7 @@ public sealed class OrderService
             CustomerName = "Liam Patel",
             ShippingAddress = "456 Oak Avenue, Austin, TX 78701",
             TotalAmount = 84.50m,
-            Status = "Shipped",
+            Status = OrderStatus.Shipped,
             OrderedAt = new DateTimeOffset(2026, 8, 22, 9, 15, 0, TimeSpan.Zero)
         }
     ];
@@ -35,6 +35,35 @@ public sealed class OrderService
         order.Id = order.Id == Guid.Empty ? Guid.NewGuid() : order.Id;
         _items.Add(order);
         return order;
+    }
+
+    /// <summary>
+    /// Validates checkout details and creates an order from a shopping cart's contents.
+    /// Order-shape and required-field concerns belong here rather than in CartService,
+    /// which should only be responsible for cart-specific invariants.
+    /// </summary>
+    public Order CreateFromCart(ShoppingCart cart, CheckoutRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.CustomerName))
+        {
+            throw new ArgumentException("Customer name is required.", nameof(request));
+        }
+
+        if (string.IsNullOrWhiteSpace(request.ShippingAddress))
+        {
+            throw new ArgumentException("Shipping address is required.", nameof(request));
+        }
+
+        Order order = new()
+        {
+            CustomerName = request.CustomerName.Trim(),
+            ShippingAddress = request.ShippingAddress.Trim(),
+            TotalAmount = cart.Total,
+            Status = OrderStatus.Processing,
+            OrderedAt = DateTimeOffset.UtcNow
+        };
+
+        return Create(order);
     }
 
     public Order? Update(Guid id, Order order)

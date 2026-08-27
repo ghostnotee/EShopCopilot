@@ -10,7 +10,7 @@ public class Order
 
     public decimal TotalAmount { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
     public DateTimeOffset OrderedAt { get; set; }
 }

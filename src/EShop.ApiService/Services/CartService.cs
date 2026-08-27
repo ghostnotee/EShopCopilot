@@ -64,32 +64,13 @@ public sealed class CartService(ProductService productService, OrderService orde
 
     public Order Checkout(string cartId, CheckoutRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.CustomerName))
-        {
-            throw new ArgumentException("Customer name is required.", nameof(request));
-        }
-
-        if (string.IsNullOrWhiteSpace(request.ShippingAddress))
-        {
-            throw new ArgumentException("Shipping address is required.", nameof(request));
-        }
-
         ShoppingCart cart = GetCart(cartId);
         if (cart.Items.Count == 0)
         {
             throw new InvalidOperationException("The shopping cart is empty.");
         }
 
-        Order order = new()
-        {
-            CustomerName = request.CustomerName.Trim(),
-            ShippingAddress = request.ShippingAddress.Trim(),
-            TotalAmount = cart.Total,
-            Status = "Processing",
-            OrderedAt = DateTimeOffset.UtcNow
-        };
-
-        Order createdOrder = orderService.Create(order);
+        Order createdOrder = orderService.CreateFromCart(cart, request);
         Clear(cartId);
         return createdOrder;
     }
