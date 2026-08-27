@@ -10,7 +10,7 @@ public sealed class CartApiClient(HttpClient httpClient)
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/carts");
         request.Headers.Add("X-Cart-Id", cartId);
 
-        using var response = await httpClient.SendAsync(request);
+        using HttpResponseMessage response = await httpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
         {
             return null;

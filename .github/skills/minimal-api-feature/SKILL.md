@@ -9,17 +9,17 @@ compatibility: Requires dotnet>=10.0
 # Minimal API Feature Builder
 
 ## Overview
-This skill generates a standardized backend domain slice in the `EShopCopilot.ApiService` project. It ensures all new entities follow the exact same file structure, dependency injection pattern, and routing conventions without relying on external templates.
+This skill generates a standardized backend domain slice across the `EShopCopilot.Shared` and `EShopCopilot.ApiService` projects. It ensures all new entities follow the exact same file structure, dependency injection pattern, and routing conventions without relying on external templates.
 
 ## Prerequisites & Inputs
 * `domain_name`: The singular name of the entity being created (e.g., `Product`, `Order`).
-* `target_project`: Must be `EShopCopilot.ApiService`.
+* `target_project`: Must be `EShopCopilot.ApiService`; domain models are created in `EShopCopilot.Shared`.
 
 ## Process Steps
 
 1. **Model Generation:**
-   Create `Models/{domain_name}.cs`.
-   *Requirement:* The class must be `public` and include a `public Guid Id { get; set; }` property.
+   Create `src/EShop.Shared/Models/{domain_name}.cs`.
+   *Requirement:* The class must be `public`, use the `EShop.Shared.Models` namespace, and include a `public Guid Id { get; set; }` property.
 
 2. **Service Generation:**
    Create `Services/{domain_name}Service.cs`.
@@ -63,4 +63,4 @@ If the domain requires relational data: Remind the user that this skill defaults
 ## Verification Checklist
 [ ] Endpoints use MapGroup for route prefixing.
 [ ] Service is designed to be registered as a Singleton (thread-safety considerations aside for prototyping).
-[ ] Model is placed in the correct Models/ namespace.
+[ ] Model is placed in `EShop.Shared/Models/` with the `EShop.Shared.Models` namespace.
