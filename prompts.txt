@@ -71,7 +71,7 @@ backend prompt:
 frontend prompt:
 Use the blazor-crud-component skill to create a Blazor UI for the @Customer.cs domain
 or
-/blazor-crud-component create a Blazor UI for the @EShopCopilot.ApiService\Models\Customer.cs domain
+/blazor-crud-component create a Blazor UI for the @EShopCopilot.Shared\Models\Customer.cs domain
 
 -- make it autopilot and develop this, enable all permissions
 

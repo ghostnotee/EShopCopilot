@@ -24,6 +24,9 @@ builder.Services.AddHttpClient<CartApiClient>(client =>
 builder.Services.AddHttpClient<OrderApiClient>(client =>
     client.BaseAddress = new Uri("http://apiservice"));
 
+builder.Services.AddHttpClient<CustomerApiClient>(client =>
+    client.BaseAddress = new Uri("http://apiservice"));
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
