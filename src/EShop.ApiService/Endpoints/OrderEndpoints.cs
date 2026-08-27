@@ -7,7 +7,7 @@ public static class OrderEndpoints
 {
     public static IEndpointRouteBuilder MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
-        RouteGroupBuilder orders = app.MapGroup("/orders")
+        RouteGroupBuilder orders = app.MapGroup("/api/orders")
             .WithTags("Orders");
 
         orders.MapGet("/", (OrderService service) =>
@@ -24,12 +24,12 @@ public static class OrderEndpoints
         orders.MapPost("/", (Order order, OrderService service) =>
         {
             Order createdOrder = service.Create(order);
-            return Results.Created($"/orders/{createdOrder.Id}", createdOrder);
+            return Results.Created($"/api/orders/{createdOrder.Id}", createdOrder);
         });
 
         orders.MapPut("/{id:guid}", (Guid id, Order order, OrderService service) =>
-            service.Update(id, order)
-                ? Results.NoContent()
+            service.Update(id, order) is Order updated
+                ? Results.Ok(updated)
                 : Results.NotFound());
 
         orders.MapDelete("/{id:guid}", (Guid id, OrderService service) =>

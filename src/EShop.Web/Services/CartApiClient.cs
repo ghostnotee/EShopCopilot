@@ -7,7 +7,7 @@ public sealed class CartApiClient(HttpClient httpClient)
 {
     public async Task<ShoppingCart?> GetCartAsync(string cartId)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, "/cart");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/carts");
         request.Headers.Add("X-Cart-Id", cartId);
 
         using var response = await httpClient.SendAsync(request);
@@ -21,7 +21,7 @@ public sealed class CartApiClient(HttpClient httpClient)
 
     public async Task<ShoppingCart?> AddItemAsync(string cartId, Guid productId, int quantity)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, "/cart/items");
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/carts/items");
         request.Headers.Add("X-Cart-Id", cartId);
         request.Content = JsonContent.Create(new AddCartItemRequest
         {
@@ -40,7 +40,7 @@ public sealed class CartApiClient(HttpClient httpClient)
 
     public async Task<bool> RemoveItemAsync(string cartId, Guid productId)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"/cart/items/{productId}");
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"/api/carts/items/{productId}");
         request.Headers.Add("X-Cart-Id", cartId);
 
         using var response = await httpClient.SendAsync(request);
@@ -49,7 +49,7 @@ public sealed class CartApiClient(HttpClient httpClient)
 
     public async Task<Order?> CheckoutAsync(string cartId, CheckoutRequest request)
     {
-        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/cart/checkout");
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/carts/checkout");
         httpRequest.Headers.Add("X-Cart-Id", cartId);
         httpRequest.Content = JsonContent.Create(request);
 

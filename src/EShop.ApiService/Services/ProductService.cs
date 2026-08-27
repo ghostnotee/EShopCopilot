@@ -4,7 +4,7 @@ namespace EShop.ApiService.Services;
 
 public sealed class ProductService
 {
-    private readonly List<Product> products =
+    private readonly List<Product> _items =
     [
         new()
         {
@@ -48,33 +48,33 @@ public sealed class ProductService
         }
     ];
 
-    public IReadOnlyList<Product> GetAll() => products.AsReadOnly();
+    public IReadOnlyList<Product> GetAll() => _items.AsReadOnly();
 
-    public Product? GetById(Guid id) => products.FirstOrDefault(product => product.Id == id);
+    public Product? GetById(Guid id) => _items.FirstOrDefault(product => product.Id == id);
 
     public Product Create(Product product)
     {
         product.Id = product.Id == Guid.Empty ? Guid.NewGuid() : product.Id;
-        products.Add(product);
+        _items.Add(product);
         return product;
     }
 
-    public bool Update(Guid id, Product product)
+    public Product? Update(Guid id, Product product)
     {
-        var index = products.FindIndex(existingProduct => existingProduct.Id == id);
+        var index = _items.FindIndex(existingProduct => existingProduct.Id == id);
         if (index < 0)
         {
-            return false;
+            return null;
         }
 
         product.Id = id;
-        products[index] = product;
-        return true;
+        _items[index] = product;
+        return product;
     }
 
     public bool Delete(Guid id)
     {
         var product = GetById(id);
-        return product is not null && products.Remove(product);
+        return product is not null && _items.Remove(product);
     }
 }

@@ -7,8 +7,8 @@ public static class CartEndpoints
 {
     public static IEndpointRouteBuilder MapCartEndpoints(this IEndpointRouteBuilder app)
     {
-        RouteGroupBuilder cart = app.MapGroup("/cart")
-            .WithTags("Cart");
+        RouteGroupBuilder cart = app.MapGroup("/api/carts")
+            .WithTags("Carts");
 
         cart.MapGet("/", (HttpRequest request, CartService cartService) =>
         {
@@ -48,7 +48,7 @@ public static class CartEndpoints
             {
                 string cartId = GetCartId(httpRequest);
                 Order createdOrder = cartService.Checkout(cartId, request);
-                return Results.Created($"/orders/{createdOrder.Id}", createdOrder);
+                return Results.Created($"/api/orders/{createdOrder.Id}", createdOrder);
             }
             catch (ArgumentException)
             {
