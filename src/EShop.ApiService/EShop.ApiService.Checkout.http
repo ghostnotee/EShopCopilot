@@ -1,0 +1,129 @@
+### EShop.ApiService — Checkout Workflow Lifecycle Test
+### Validates: (1) cart creation, (2) adding a product to the cart,
+### (3) checkout creating an Order, and that the cart is cleared afterward.
+###
+### Data flow:
+###   ProductService (read product) -> CartService (create/hold cart, add item)
+###     -> CartService.Checkout -> OrderService.CreateFromCart (creates Order)
+###     -> CartService.Clear (empties cart)
+###
+### Run requests top-to-bottom in the same session; {{CartId}} ties every
+### request to the same in-memory cart (CartService keys carts by X-Cart-Id).
+
+@ApiService_HostAddress = http://localhost:5596
+@ProductId = 11111111-1111-1111-1111-111111111111
+@CartId = checkout-lifecycle-{{$timestamp}}
+
+### Step 1: Create the cart
+# GETting a cart that doesn't exist yet causes CartService.GetCart to create
+# and store a new empty ShoppingCart for this X-Cart-Id (see CartService.GetCart).
+# Expect: 200 OK, body { "items": [], "total": 0 }
+# @name createCart
+GET {{ApiService_HostAddress}}/api/carts/
+X-Cart-Id: {{CartId}}
+Accept: application/json
+
+> {%
+    client.test("Cart is created empty", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.items.length === 0, "New cart should have no items");
+        client.assert(response.body.total === 0, "New cart total should be 0");
+    });
+%}
+
+### Step 2: Add a product into the cart
+# Expect: 200 OK, cart now contains 2x the requested product.
+# @name addItem
+POST {{ApiService_HostAddress}}/api/carts/items
+X-Cart-Id: {{CartId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "productId": "{{ProductId}}",
+  "quantity": 2
+}
+
+> {%
+    client.test("Item added to cart", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.items.length === 1, "Cart should contain exactly one line item");
+        client.assert(response.body.items[0].productId.toLowerCase() === "11111111-1111-1111-1111-111111111111",
+            "Cart item should reference the requested product");
+        client.assert(response.body.items[0].quantity === 2, "Quantity should be 2");
+        client.assert(response.body.total > 0, "Cart total should reflect the added item");
+    });
+    client.global.set("cartTotal", response.body.total);
+%}
+
+### Step 3: Checkout — creates an Order from the cart and clears the cart
+# Expect: 201 Created, Location header /api/orders/{id}, body is the new Order
+# with Status "Processing" and TotalAmount equal to the cart total captured above.
+# @name checkout
+POST {{ApiService_HostAddress}}/api/carts/checkout
+X-Cart-Id: {{CartId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "customerName": "Jordan Avery",
+  "shippingAddress": "742 Evergreen Terrace, Springfield, IL 62704"
+}
+
+> {%
+    client.test("Checkout creates an order", function () {
+        client.assert(response.status === 201, "Expected 201 Created");
+        client.assert(response.body.id && response.body.id.length > 0, "Order should have an id");
+        client.assert(response.body.status === "Processing", "New order status should be Processing");
+        client.assert(response.body.customerName === "Jordan Avery", "Order should carry the checkout customer name");
+        client.assert(Math.abs(response.body.totalAmount - client.global.get("cartTotal")) < 0.001,
+            "Order total should match the cart total at checkout time");
+    });
+    client.global.set("OrderId", response.body.id);
+%}
+
+### Validation A: Cart is cleared after checkout
+# Expect: 200 OK, body { "items": [], "total": 0 } — proves CartService.Clear ran.
+GET {{ApiService_HostAddress}}/api/carts/
+X-Cart-Id: {{CartId}}
+Accept: application/json
+
+> {%
+    client.test("Cart is empty after checkout", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.items.length === 0, "Cart should be cleared after checkout");
+        client.assert(response.body.total === 0, "Cart total should be 0 after checkout");
+    });
+%}
+
+### Validation B: The created Order persists and is retrievable
+# Expect: 200 OK, order matches the one returned by checkout.
+GET {{ApiService_HostAddress}}/api/orders/{{OrderId}}
+Accept: application/json
+
+> {%
+    client.test("Order is retrievable after checkout", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.id === client.global.get("OrderId"), "Order id should match checkout response");
+        client.assert(response.body.status === "Processing", "Order status should still be Processing");
+    });
+%}
+
+### Edge case: Checking out an already-empty cart must fail, not silently succeed
+# Expect: 500/4xx — CartService.Checkout throws InvalidOperationException("The shopping cart is empty.")
+# when Items.Count == 0. Confirms checkout cannot create a phantom order from a cleared cart.
+POST {{ApiService_HostAddress}}/api/carts/checkout
+X-Cart-Id: {{CartId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "customerName": "Jordan Avery",
+  "shippingAddress": "742 Evergreen Terrace, Springfield, IL 62704"
+}
+
+> {%
+    client.test("Empty cart cannot be checked out again", function () {
+        client.assert(response.status >= 400, "Expected an error response for an empty-cart checkout");
+    });
+%}

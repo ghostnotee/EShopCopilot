@@ -1,0 +1,49 @@
+@page "/checkout"
+@using EShop.Shared.Models
+@using SharedOrder = EShop.Shared.Models.Order
+@using EShop.Web.Services
+@inject CartApiClient CartApiClient
+@inject CartSessionService CartSessionService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Checkout</PageTitle>
+
+<h1>Checkout</h1>
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm Model="checkoutRequest" OnValidSubmit="HandleCheckout">
+    <div class="mb-3">
+        <label class="form-label" for="customer-name">Customer Name</label>
+        <InputText id="customer-name" class="form-control" @bind-Value="checkoutRequest.CustomerName" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="shipping-address">Shipping Address</label>
+        <InputTextArea id="shipping-address" class="form-control" @bind-Value="checkoutRequest.ShippingAddress" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Place Order</button>
+</EditForm>
+
+@code {
+    private readonly CheckoutRequest checkoutRequest = new();
+    private string? errorMessage;
+
+    private async Task HandleCheckout()
+    {
+        string cartId = CartSessionService.GetCartId();
+        SharedOrder? order = await CartApiClient.CheckoutAsync(cartId, checkoutRequest);
+        if (order is null)
+        {
+            errorMessage = "Checkout could not be completed. Please verify your cart contents and customer details.";
+            return;
+        }
+
+        Navigation.NavigateTo($"/order/{order.Id}");
+    }
+}

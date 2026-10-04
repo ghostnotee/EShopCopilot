@@ -1,4 +1,6 @@
+using System.Text.Json.Serialization;
 using EShop.ApiService.Endpoints;
+using EShop.ApiService.Exceptions;
 using EShop.ApiService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,9 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add services to the container.
+builder.Services.AddExceptionHandler<KnownExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddSingleton<ProductService>();
 builder.Services.AddSingleton<OrderService>();
+builder.Services.AddSingleton<CartService>();
+builder.Services.AddSingleton<CustomerService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -27,5 +34,7 @@ if (app.Environment.IsDevelopment())
 app.MapDefaultEndpoints();
 app.MapProductEndpoints();
 app.MapOrderEndpoints();
+app.MapCartEndpoints();
+app.MapCustomerEndpoints();
 
 app.Run();

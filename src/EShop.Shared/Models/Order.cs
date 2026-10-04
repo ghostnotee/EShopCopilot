@@ -1,4 +1,4 @@
-namespace EShop.ApiService.Models;
+namespace EShop.Shared.Models;
 
 public class Order
 {
@@ -10,7 +10,7 @@ public class Order
 
     public decimal TotalAmount { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
     public DateTimeOffset OrderedAt { get; set; }
 }

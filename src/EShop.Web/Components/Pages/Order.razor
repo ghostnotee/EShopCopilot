@@ -1,0 +1,39 @@
+@page "/order/{Id:guid}"
+@using EShop.Shared.Models
+@using SharedOrder = EShop.Shared.Models.Order
+@inject OrderApiClient OrderApiClient
+@rendermode InteractiveServer
+
+<PageTitle>Order Confirmation</PageTitle>
+
+<h1>Order Confirmation</h1>
+
+@if (order is null)
+{
+    <p>Loading order details...</p>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Order @order.Id</h5>
+            <p><strong>Customer:</strong> @order.CustomerName</p>
+            <p><strong>Shipping Address:</strong> @order.ShippingAddress</p>
+            <p><strong>Total:</strong> @order.TotalAmount.ToString("C")</p>
+            <p><strong>Status:</strong> @order.Status</p>
+            <p><strong>Order Date:</strong> @order.OrderedAt.ToLocalTime().ToString("g")</p>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private SharedOrder? order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        order = await OrderApiClient.GetOrderAsync(Id);
+    }
+}

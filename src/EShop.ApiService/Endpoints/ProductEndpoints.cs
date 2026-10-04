@@ -1,5 +1,5 @@
-using EShop.ApiService.Models;
 using EShop.ApiService.Services;
+using EShop.Shared.Models;
 
 namespace EShop.ApiService.Endpoints;
 
@@ -7,7 +7,7 @@ public static class ProductEndpoints
 {
     public static IEndpointRouteBuilder MapProductEndpoints(this IEndpointRouteBuilder app)
     {
-        RouteGroupBuilder products = app.MapGroup("/products")
+        RouteGroupBuilder products = app.MapGroup("/api/products")
             .WithTags("Products");
 
         products.MapGet("/", (ProductService service) =>
@@ -24,12 +24,12 @@ public static class ProductEndpoints
         products.MapPost("/", (Product product, ProductService service) =>
         {
             Product createdProduct = service.Create(product);
-            return Results.Created($"/products/{createdProduct.Id}", createdProduct);
+            return Results.Created($"/api/products/{createdProduct.Id}", createdProduct);
         });
 
         products.MapPut("/{id:guid}", (Guid id, Product product, ProductService service) =>
-            service.Update(id, product)
-                ? Results.NoContent()
+            service.Update(id, product) is Product updated
+                ? Results.Ok(updated)
                 : Results.NotFound());
 
         products.MapDelete("/{id:guid}", (Guid id, ProductService service) =>
